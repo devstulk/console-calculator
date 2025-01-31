@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Text.RegularExpressions;
 
 namespace ConsoleCalculator
@@ -45,12 +44,12 @@ namespace ConsoleCalculator
             Console.WriteLine("|            CONSOLE CALCULATOR            |");
             Console.WriteLine("|                                          |");
             Console.WriteLine(" ========================================== ");
-            Console.WriteLine("|          To exit press CTRL + C          |");
-            Console.WriteLine(" ========================================== ");
+
         }
 
         static void calculatorTemplate()
         {
+            Console.Clear();
             buildHeader();
             buildHistory();
             buildBody();
@@ -69,6 +68,8 @@ namespace ConsoleCalculator
         {
             Console.WriteLine($"| Operation: {_operation.PadRight(29)} |");
             Console.WriteLine($"| Result: {_result.PadRight(32)} |");
+            Console.WriteLine("|------------------------------------------|");
+            Console.WriteLine("|          To exit press CTRL + C          |");
             Console.WriteLine(" ========================================== ");
         }
 
@@ -81,7 +82,8 @@ namespace ConsoleCalculator
             if (!IsValidOperation(operation))
             {
                 Console.WriteLine("Invalid operation, try again!");
-                getValue();
+                Thread.Sleep(3000);
+                return;
             }
 
             calculate(operation);
@@ -89,13 +91,7 @@ namespace ConsoleCalculator
 
         static void calculate(string operation)
         {
-            if (_history.Count == 5)
-                _history.Dequeue();
-
-            if (_result.Length > 0 && _operation.Length > 0)
-                _history.Enqueue($"{_operation} + {_result}");
-
-            _operation = operation;
+            string oldResult = _result;
 
             try
             {
@@ -104,8 +100,17 @@ namespace ConsoleCalculator
             catch (System.Exception)
             {
                 Console.WriteLine("Unable to calculate operation, try again!");
-                getValue();
+                Thread.Sleep(3000);
+                return;
             }
+
+            if (_history.Count == 5)
+                _history.Dequeue();
+
+            if (_result.Length > 0 && _operation.Length > 0)
+                _history.Enqueue($"{_operation} = {oldResult}");
+
+            _operation = operation;
         }
 
         static bool IsValidOperation(string operation)
