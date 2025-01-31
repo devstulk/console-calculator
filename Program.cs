@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace ConsoleCalculator
 {
@@ -6,20 +8,34 @@ namespace ConsoleCalculator
     {
         private static Queue<string> _history { get; set; } = new Queue<string>();
         private static string _operation { get; set; } = "";
-        private static string _result { get; set; } = "0";
+        private static string _result { get; set; } = "";
+        private static int _step { get; set; } = 0;
 
 
         static void Main()
         {
-            buildHeader();
-            buildHistory();
-            buildBody();
+            while (true)
+                callStep();
+        }
 
-            // HARD CODE ONLY TEST.
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.Write("Digite o um valor: ");
-            Console.ReadLine();
+        static void callStep()
+        {
+            switch (_step)
+            {
+                case 0:
+                    calculatorTemplate();
+                    _step = 1;
+                    break;
+                case 1:
+                    getValue();
+                    _step = 0;
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid step.");
+                    Console.WriteLine("Exiting...");
+                    Environment.Exit(0);
+                    break;
+            }
         }
 
         static void buildHeader()
@@ -29,19 +45,19 @@ namespace ConsoleCalculator
             Console.WriteLine("|            CONSOLE CALCULATOR            |");
             Console.WriteLine("|                                          |");
             Console.WriteLine(" ========================================== ");
+            Console.WriteLine("|          To exit press CTRL + C          |");
+            Console.WriteLine(" ========================================== ");
+        }
+
+        static void calculatorTemplate()
+        {
+            buildHeader();
+            buildHistory();
+            buildBody();
         }
 
         static void buildHistory()
         {
-            // HARD CODE ONLY TEST.
-            _history.Enqueue("5+6*7 = 1");
-            _history.Enqueue("5+6*7 = 2");
-            _history.Enqueue("5+6*7 = 3");
-            _history.Enqueue("5+6*7 = 4");
-            _history.Enqueue("5+6*7 = 5");
-            _history.Dequeue();
-            _history.Enqueue("5+6*7 = 6");
-
             Console.WriteLine("| History                                  |");
             Console.WriteLine("|------------------------------------------|");
             foreach (var item in _history)
@@ -52,20 +68,50 @@ namespace ConsoleCalculator
         static void buildBody()
         {
             Console.WriteLine($"| Operation: {_operation.PadRight(29)} |");
-            Console.WriteLine($"| Result: {_operation.PadRight(32)} |");
+            Console.WriteLine($"| Result: {_result.PadRight(32)} |");
             Console.WriteLine(" ========================================== ");
         }
 
-
-        static float getValue()
+        static void getValue()
         {
-            return 1.0f;
+            Console.WriteLine("");
+            Console.Write("Enter the operation: ");
+            string operation = Console.ReadLine() ?? "";
+
+            if (!IsValidOperation(operation))
+            {
+                Console.WriteLine("Invalid operation, try again!");
+                getValue();
+            }
+
+            calculate(operation);
         }
 
-        static int getOperator()
+        static void calculate(string operation)
         {
-            return 1;
+            if (_history.Count == 5)
+                _history.Dequeue();
+
+            if (_result.Length > 0 && _operation.Length > 0)
+                _history.Enqueue($"{_operation} + {_result}");
+
+            _operation = operation;
+
+            try
+            {
+                _result = new DataTable().Compute(operation, string.Empty).ToString() ?? "";
+            }
+            catch (System.Exception)
+            {
+                Console.WriteLine("Unable to calculate operation, try again!");
+                getValue();
+            }
         }
 
+        static bool IsValidOperation(string operation)
+        {
+            string pattern = @"^[0-9]+(\s*[-+*/]\s*[0-9]+|\s*[-+*/]\s*\([0-9]+(\s*[-+*/]\s*[0-9]+)*\))*(\s*[-+*/]\s*[0-9]+|\s*\([0-9]+(\s*[-+*/]\s*[0-9]+)*\))*$"; ;
+            return Regex.IsMatch(operation, pattern);
+        }
     }
 }
