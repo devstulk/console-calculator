@@ -10,23 +10,28 @@ namespace ConsoleCalculator
         private static string _result { get; set; } = "";
         private static int _step { get; set; } = 0;
 
-
+        /**
+         * The main.
+        */
         static void Main()
         {
             while (true)
-                callStep();
+                CallStep();
         }
 
-        static void callStep()
+        /**
+         * Define which step is called.
+        */
+        static void CallStep()
         {
             switch (_step)
             {
                 case 0:
-                    calculatorTemplate();
+                    CalculatorTemplate();
                     _step = 1;
                     break;
                 case 1:
-                    getValue();
+                    GetOperation();
                     _step = 0;
                     break;
                 default:
@@ -37,7 +42,10 @@ namespace ConsoleCalculator
             }
         }
 
-        static void buildHeader()
+        /**
+         * Build calculator header.
+        */
+        static void BuildHeader()
         {
             Console.WriteLine(" ========================================== ");
             Console.WriteLine("|                                          |");
@@ -47,15 +55,10 @@ namespace ConsoleCalculator
 
         }
 
-        static void calculatorTemplate()
-        {
-            Console.Clear();
-            buildHeader();
-            buildHistory();
-            buildBody();
-        }
-
-        static void buildHistory()
+        /**
+         * Build calculator history.
+        */
+        static void BuildHistory()
         {
             Console.WriteLine("| History                                  |");
             Console.WriteLine("|------------------------------------------|");
@@ -64,7 +67,10 @@ namespace ConsoleCalculator
             Console.WriteLine("|------------------------------------------|");
         }
 
-        static void buildBody()
+        /**
+         * Build calculator body.
+        */
+        static void BuildBody()
         {
             Console.WriteLine($"| Operation: {_operation.PadRight(29)} |");
             Console.WriteLine($"| Result: {_result.PadRight(32)} |");
@@ -73,7 +79,21 @@ namespace ConsoleCalculator
             Console.WriteLine(" ========================================== ");
         }
 
-        static void getValue()
+        /**
+         * Show calculator template.
+        */
+        static void CalculatorTemplate()
+        {
+            Console.Clear();
+            BuildHeader();
+            BuildHistory();
+            BuildBody();
+        }
+
+        /**
+         * Get operation to calculate. 
+        */
+        static void GetOperation()
         {
             Console.WriteLine("");
             Console.Write("Enter the operation: ");
@@ -86,10 +106,13 @@ namespace ConsoleCalculator
                 return;
             }
 
-            calculate(operation);
+            Calculate(operation);
         }
 
-        static void calculate(string operation)
+        /**
+         * Calculate operation.
+        */
+        static void Calculate(string operation)
         {
             string oldResult = _result;
 
@@ -113,6 +136,9 @@ namespace ConsoleCalculator
             _operation = operation;
         }
 
+        /**
+         * Check if operation is valid.
+        */
         static bool IsValidOperation(string operation)
         {
             string pattern = @"^[0-9]+(\s*[-+*/]\s*[0-9]+|\s*[-+*/]\s*\([0-9]+(\s*[-+*/]\s*[0-9]+)*\))*(\s*[-+*/]\s*[0-9]+|\s*\([0-9]+(\s*[-+*/]\s*[0-9]+)*\))*$"; ;
